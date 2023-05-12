@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="1.1"
+VERSION="1.2"
 
 #  kesire.sh
 #
@@ -124,7 +124,7 @@ if [ "$COUNTRY_CODE" = "" ]; then
     printf "Insert your country code [%s]: " "${DEFAULT_COUNTRY_CODE}"
     read -r COUNTRY_CODE
 
-    if ! echo "$COUNTRY_CODE" | grep -qP "^[A-Z]{2}$"; then
+    if ! echo "$COUNTRY_CODE" | grep -q "^[A-Z]\{2\}$"; then
         echo "Empty or invalid country code (using default: $DEFAULT_COUNTRY_CODE)."
         COUNTRY_CODE=$DEFAULT_COUNTRY_CODE
     fi
@@ -134,7 +134,7 @@ if [ "$STATE_OR_PROVINCE" = "" ]; then
     printf "Insert your state or province [%s]: " "${DEFAULT_STATE_OR_PROVINCE}"
     read -r STATE_OR_PROVINCE
 
-    if ! echo "$STATE_OR_PROVINCE" | grep -qP "^[A-Z][a-z]+$"; then
+    if ! echo "$STATE_OR_PROVINCE" | grep -q "^[A-Z][a-z]\+$"; then
         echo "Empty or invalid state or province (using default: $DEFAULT_STATE_OR_PROVINCE)."
         STATE_OR_PROVINCE=$DEFAULT_STATE_OR_PROVINCE
     fi
@@ -144,31 +144,30 @@ if [ "$LOCALITY" = "" ]; then
     printf "Insert your state or province [%s]: " "${DEFAULT_LOCALITY}"
     read -r LOCALITY
 
-    if ! echo "$LOCALITY" | grep -qP "^[A-Z][a-z]+$"; then
+    if ! echo "$LOCALITY" | grep -q "^[A-Z][a-z]\+$"; then
         echo "Empty or invalid locality (using default: $DEFAULT_LOCALITY)."
         LOCALITY=$DEFAULT_LOCALITY
     fi
 fi
 
 
-while ! echo "$ORGANIZATION" | grep -qP "^[0-9A-Za-z' ]+$"; do
+while ! echo "$ORGANIZATION" | grep -q "^[0-9A-Za-z' ]\+$"; do
     printf "Insert your organization (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATION}"
     read -r ORGANIZATION
 done
 
 
-while ! echo "$ORGANIZATIONAL_UNIT" | grep -qP "^[0-9A-Za-z' ]+$"; do
+while ! echo "$ORGANIZATIONAL_UNIT" | grep -q "^[0-9A-Za-z' ]\+$"; do
     printf "Insert your organizational unit (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATIONAL_UNIT}"
     read -r ORGANIZATIONAL_UNIT
 done
 
-while ! echo "$EMAIL" | grep -qP "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"; do
+while ! echo "$EMAIL" | grep -q "^[a-zA-Z0-9\._%+-]\+\@[a-zA-Z0-9\.-]\+\.[a-zA-Z]\{2,4\}$"; do
     printf "Insert your email (e.g. %s, etc.): " "${EXAMPLE_EMAIL}"
     read -r EMAIL
 done
 
-
-while ! echo "$CN" | grep -qP "^(((?!\-))(xn\-\-)?[a-z0-9\-_]{0,61}[a-z0-9]{1,1}\.)*(xn\-\-)?([a-z0-9\-]{1,61}|[a-z0-9\-]{1,30})\.[a-z]{2,}$"; do
+while ! echo "$CN" | grep -q '^[a-zA-Z0-9]\{1,\}\([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9]\)\{0,1\}\(\.[a-zA-Z]\{2,\}\)\{1,\}$'; do
     printf "Insert the common name, i.e. the main domain name for which the certificate will be issued (e.g. %s, etc.): " "${EXAMPLE_CN}"
     read -r CN
 done
@@ -183,7 +182,7 @@ if [ "$ALT_NAMES" = "" ] && [ "$USE_ALT_NAMES" = "yes" ]; then
             break;
         fi
 
-        if echo "$ALT_NAME" | grep -qP "^(((?!\-))(xn\-\-)?[a-z0-9\-_]{0,61}[a-z0-9]{1,1}\.)*(xn\-\-)?([a-z0-9\-]{1,61}|[a-z0-9\-]{1,30})\.[a-z]{2,}$"; then
+        if echo "$ALT_NAME" | grep -q '^[a-zA-Z0-9]\{1,\}\([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9]\)\{0,1\}\(\.[a-zA-Z]\{2,\}\)\{1,\}$'; then
             if ( ! echo "${ALT_NAMES}" | grep -q "${ALT_NAME}" ) && ( ! echo "${CN}" | grep -q "${ALT_NAME}" ); then
                 ALT_NAMES="${ALT_NAMES} ${ALT_NAME}"
             fi
