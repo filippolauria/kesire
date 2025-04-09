@@ -17,7 +17,7 @@ In interactive mode, the script prompts you for the necessary information, such 
 
 Here it is shown how to get and use `kesire` for generating a key and a CSR for the example domain `example.xyz`:
 ```bash
-mkdir example.xyz && cd example.xyz && \
+CN=example.xyz && mkdir "${CN}" && cd "${CN}" && \
 wget https://raw.githubusercontent.com/filippolauria/kesire/main/kesire.sh && \
 chmod +x kesire.sh && ./kesire.sh
 ```
