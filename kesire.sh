@@ -151,13 +151,13 @@ if [ "$LOCALITY" = "" ]; then
 fi
 
 
-while ! echo "$ORGANIZATION" | grep -q "^[0-9A-Za-z-' ]\+$"; do
+while ! echo "$ORGANIZATION" | grep -q "^[0-9A-Za-z' -]\+$"; do
     printf "Insert your organization (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATION}"
     read -r ORGANIZATION
 done
 
 
-while ! echo "$ORGANIZATIONAL_UNIT" | grep -q "^[0-9A-Za-z-' ]\+$"; do
+while ! echo "$ORGANIZATIONAL_UNIT" | grep -q "^[0-9A-Za-z' -]\+$"; do
     printf "Insert your organizational unit (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATIONAL_UNIT}"
     read -r ORGANIZATIONAL_UNIT
 done
