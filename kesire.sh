@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION="1.3"
+VERSION="1.4"
 
 #  kesire.sh
 #
@@ -87,15 +87,9 @@ DEFAULT_LOCALITY="Roma"
 
 EXAMPLE_ORGANIZATION="My Organization"
 EXAMPLE_ORGANIZATIONAL_UNIT="ICT Unit, Legal Unit"
-EXAMPLE_EMAIL="firstname.lastname@example.xyz"
-
-# common name, i.e. the main domain name for which the certificate will be issued
-# e.g. example.com, etc.
 EXAMPLE_CN="example.xyz"
-
-# a space-separated list of alternative fully qualified domain names (optional)
-# e.g. fqdn1.example.com fqdn2.example.com fqdn3.example.com
-EXAMPLE_ALT_NAMES="fqdn1.example.xyz, fqdn2.example.xyz, fqdn3.example.xyz"
+EXAMPLE_EMAIL="firstname.lastname@${EXAMPLE_CN}"
+EXAMPLE_ALT_NAMES="fqdn1.${EXAMPLE_CN}"
 
 #
 # ~ the script
@@ -130,11 +124,14 @@ if [ "$COUNTRY_CODE" = "" ]; then
     fi
 fi
 
+
+ST_LOC_ORG_UNIT_REGEX="^[0-9A-Za-z' -]\+$"
+
 if [ "$STATE_OR_PROVINCE" = "" ]; then
     printf "Insert your state or province [%s]: " "${DEFAULT_STATE_OR_PROVINCE}"
     read -r STATE_OR_PROVINCE
 
-    if ! echo "$STATE_OR_PROVINCE" | grep -q "^[A-Z][a-z]\+$"; then
+    if ! echo "$STATE_OR_PROVINCE" | grep -q "${ST_LOC_ORG_UNIT_REGEX}"; then
         echo "Empty or invalid state or province (using default: $DEFAULT_STATE_OR_PROVINCE)."
         STATE_OR_PROVINCE=$DEFAULT_STATE_OR_PROVINCE
     fi
@@ -144,20 +141,19 @@ if [ "$LOCALITY" = "" ]; then
     printf "Insert your state or province [%s]: " "${DEFAULT_LOCALITY}"
     read -r LOCALITY
 
-    if ! echo "$LOCALITY" | grep -q "^[A-Z][a-z]\+$"; then
+    if ! echo "$LOCALITY" | grep -q "${ST_LOC_ORG_UNIT_REGEX}"; then
         echo "Empty or invalid locality (using default: $DEFAULT_LOCALITY)."
         LOCALITY=$DEFAULT_LOCALITY
     fi
 fi
 
-
-while ! echo "$ORGANIZATION" | grep -q "^[0-9A-Za-z' -]\+$"; do
+while ! echo "$ORGANIZATION" | grep -q "${ST_LOC_ORG_UNIT_REGEX}"; do
     printf "Insert your organization (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATION}"
     read -r ORGANIZATION
 done
 
 
-while ! echo "$ORGANIZATIONAL_UNIT" | grep -q "^[0-9A-Za-z' -]\+$"; do
+while ! echo "$ORGANIZATIONAL_UNIT" | grep -q "${ST_LOC_ORG_UNIT_REGEX}"; do
     printf "Insert your organizational unit (e.g. %s, etc.): " "${EXAMPLE_ORGANIZATIONAL_UNIT}"
     read -r ORGANIZATIONAL_UNIT
 done
@@ -167,7 +163,9 @@ while ! echo "$EMAIL" | grep -q "^[a-zA-Z0-9\._%+-]\+\@[a-zA-Z0-9\.-]\+\.[a-zA-Z
     read -r EMAIL
 done
 
-while ! echo "$CN" | grep -q '^[a-zA-Z0-9]\{1,\}\([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9]\)\{0,1\}\(\.[a-zA-Z]\{2,\}\)\{1,\}$'; do
+DOMAIN_NAME_REGEX="^\([a-zA-Z0-9][a-zA-Z0-9-]\{1,61\}[a-zA-Z0-9]\.\)\{1,\}[a-zA-Z]\{2,\}$"
+
+while ! echo "$CN" | grep -q "${DOMAIN_NAME_REGEX}"; do
     printf "Insert the common name, i.e. the main domain name for which the certificate will be issued (e.g. %s, etc.): " "${EXAMPLE_CN}"
     read -r CN
 done
@@ -182,7 +180,7 @@ if [ "$ALT_NAMES" = "" ] && [ "$USE_ALT_NAMES" = "yes" ]; then
             break;
         fi
 
-        if echo "$ALT_NAME" | grep -q '^[a-zA-Z0-9]\{1,\}\([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9]\)\{0,1\}\(\.[a-zA-Z]\{2,\}\)\{1,\}$'; then
+        if echo "$ALT_NAME" | grep -q "${DOMAIN_NAME_REGEX}"; then
             if ( ! echo "${ALT_NAMES}" | grep -q "${ALT_NAME}" ) && ( ! echo "${CN}" | grep -q "${ALT_NAME}" ); then
                 ALT_NAMES="${ALT_NAMES} ${ALT_NAME}"
             fi
